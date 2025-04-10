@@ -17,7 +17,7 @@ public class Image {
     private String imageName;
 
     @Column(name = "is_icon")
-    private boolean isIcon;
+    private Boolean isIcon;
 
     @Column(name = "path")
     private String path;

@@ -13,7 +13,11 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @Configuration
 public class MethodRestConfig implements RepositoryRestConfigurer {
-    private String url = "http://localhost:3000";
+    private final String[] allowedOrigins = {
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://localhost:5173" // Nếu dùng Vite
+    };
 
     @Autowired
     private EntityManager entityManager;
@@ -21,39 +25,32 @@ public class MethodRestConfig implements RepositoryRestConfigurer {
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         config.exposeIdsFor(entityManager.getMetamodel().getEntities().stream().map(Type::getJavaType).toArray(Class[]::new));
-//       //config.exposeIdsFor(TheLoai.class);
 
-
-        //CORS configuration
+        // Cấu hình CORS
         cors.addMapping("/**")
-                .allowedOrigins(url)
-                .allowedMethods("GET", "POST", "PUT", "DELETE");
+                .allowedOrigins(allowedOrigins)
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Thêm OPTIONS
+                .allowedHeaders("*")
+                .allowCredentials(true); // Nếu có Cookie/X-Auth-Token
 
-
-//        chan cac method
+        // Chặn các phương thức không mong muốn
         HttpMethod[] chanCacPhuongThuc = {
                 HttpMethod.POST,
                 HttpMethod.PUT,
                 HttpMethod.DELETE,
-                HttpMethod.PATCH,
+                HttpMethod.PATCH
         };
         disableHttpMethods(Category.class, config, chanCacPhuongThuc);
 
-// Chặn các method DELETE
-        HttpMethod[] phuongThucDelete = {
-                HttpMethod.DELETE
-        };
-        disableHttpMethods(User.class, config,phuongThucDelete );
-
+        // Nếu muốn mở DELETE cho User, xóa dòng dưới
+        HttpMethod[] phuongThucDelete = { HttpMethod.DELETE };
+        disableHttpMethods(User.class, config, phuongThucDelete);
     }
 
-    // vo hieu hoa cac method http cho bat ky entities nao
-    private void disableHttpMethods(Class c,
-                                    RepositoryRestConfiguration config,
-                                    HttpMethod[] methods){
+    private void disableHttpMethods(Class<?> c, RepositoryRestConfiguration config, HttpMethod[] methods) {
         config.getExposureConfiguration()
                 .forDomainType(c)
-                .withItemExposure((metdata, httpMethods) -> httpMethods.disable(methods))
-                .withCollectionExposure((metdata, httpMethods) -> httpMethods.disable(methods));
+                .withItemExposure((metadata, httpMethods) -> httpMethods.disable(methods))
+                .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(methods));
     }
 }
