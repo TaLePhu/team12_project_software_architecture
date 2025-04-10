@@ -12,7 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         // Cho phép tất cả các domain truy cập
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3001")  // Chỉ cho phép truy cập từ frontend tại localhost:3001
+                .allowedOrigins("http://localhost:3000")  // Chỉ cho phép truy cập từ frontend tại localhost:3001
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // Các phương thức HTTP được phép
                 .allowedHeaders("*"); // Cho phép tất cả các header
     }
