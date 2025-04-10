@@ -6,6 +6,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 
 
-@RepositoryRestResource()
+@RepositoryRestResource(path = "books")
 public interface BookRepository extends JpaRepository<Book, Integer> {
 }
