@@ -1,4 +1,4 @@
-package iuh.se.team.webbookstore_backend.controller;
+package iuh.se.team.webbookstore_backend.services;
 
 import iuh.se.team.webbookstore_backend.dao.BookRepository;
 import iuh.se.team.webbookstore_backend.dao.ImageRepository;
