@@ -56,7 +56,7 @@ public class User {
             mappedBy = "user")
     private List<FavoriteBook> favoriteBooks;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {
             CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH
     })
