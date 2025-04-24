@@ -42,6 +42,12 @@ public class User {
     @Column(name = "shipping_address")
     private String shippingAddress;
 
+    @Column(name = "is_activated")
+    private boolean isActivated;
+
+    @Column(name = "activation_code")
+    private String activationCode;
+
     @OneToMany(fetch = FetchType.LAZY,
             cascade = {
                     CascadeType.MERGE, CascadeType.PERSIST,
