@@ -42,8 +42,6 @@ public class UserServiceImpl implements UserSevice {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), rolesToAuthorities(user.getRoles()));
     }
 
-
-
     //    Chuyển đổi danh sách quyền (Quyen) của người dùng
  //    thành danh sách các đối tượng GrantedAuthority mà Spring Security sử dụng.
     private Collection<? extends GrantedAuthority> rolesToAuthorities(Collection<Role> roles) {
