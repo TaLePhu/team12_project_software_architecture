@@ -1,5 +1,6 @@
 package iuh.se.team.webbookstore_backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -31,5 +32,6 @@ public class Image {
             CascadeType.DETACH, CascadeType.REFRESH
     })
     @JoinColumn(name = "book_id", nullable = false)
+    @JsonIgnore
     private Book book;
 }

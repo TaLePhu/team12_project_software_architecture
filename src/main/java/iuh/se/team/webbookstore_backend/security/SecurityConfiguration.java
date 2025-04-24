@@ -1,6 +1,6 @@
 package iuh.se.team.webbookstore_backend.security;
 
-import iuh.se.team.webbookstore_backend.services.UserSevice;
+import iuh.se.team.webbookstore_backend.services.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,7 +24,7 @@ public class SecurityConfiguration {
 
     //Cung cấp một AuthenticationProvider để xác thực người dùng dựa trên cơ sở dữ liệu
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(UserSevice userService){
+    public DaoAuthenticationProvider authenticationProvider(UserService userService){
         DaoAuthenticationProvider dap = new DaoAuthenticationProvider();
         dap.setUserDetailsService(userService);
         dap.setPasswordEncoder(passwordEncoder());
@@ -35,9 +35,10 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                 config -> config
-                        .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINS).permitAll()
-                        .requestMatchers(HttpMethod.POST, Endpoints.PUBLIC_POST_ENDPOINS).permitAll()
-                        .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_GET_ENDPOINS).hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.POST, Endpoints.PUBLIC_POST_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_GET_ENDPOINTS).hasAuthority("ADMIN")
+                        .anyRequest().authenticated()
         );
 
         //- Cấu hình CORS cho phép các yêu cầu từ phía frontend (client) truy cập đến API.
@@ -45,6 +46,7 @@ public class SecurityConfiguration {
             cors.configurationSource(request -> {
                 CorsConfiguration corsConfig = new CorsConfiguration();
                 corsConfig.addAllowedOrigin(Endpoints.front_end_host);//- Cho phép yêu cầu từ một host được chỉ định (`front_end_host`).
+                corsConfig.addAllowedOriginPattern("*");
                 corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
                 corsConfig.addAllowedHeader("*"); // -Chấp nhận mọi header từ phía client.
                 return corsConfig;
