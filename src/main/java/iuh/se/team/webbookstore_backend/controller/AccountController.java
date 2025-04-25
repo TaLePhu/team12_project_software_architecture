@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("account")
 public class AccountController {
 
@@ -15,10 +16,16 @@ public class AccountController {
     private AccountService accountService;
 
 
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUpUser(@Validated @RequestBody User user) {
       ResponseEntity<?> response = accountService.signUp(user);
       return response;
+    };
+
+    @GetMapping("/activate")
+    public ResponseEntity<?> activateAccount(@RequestParam String email, @RequestParam String activationCode) {
+        ResponseEntity<?> response = accountService.activateAccount(email, activationCode);
+        return response;
     };
 }
