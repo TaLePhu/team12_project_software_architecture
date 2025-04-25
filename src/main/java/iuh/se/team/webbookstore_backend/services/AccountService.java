@@ -22,7 +22,9 @@ public class AccountService {
     @Autowired
     private EmailService emailService;
 
+    // Đăng ký tài khoản
     public ResponseEntity<?> signUp(User user) {
+
         if(userRepository.existsByUsername(user.getUsername())) {
             return ResponseEntity.badRequest().body("Username already exists");
         } else if(userRepository.existsByEmail(user.getEmail())) {
@@ -46,11 +48,12 @@ public class AccountService {
         return ResponseEntity.ok("signUp successful");
     };
 
-    // create activation code
+    // tạo mã kích hoạt
     private String createActivationCode() {
         return UUID.randomUUID().toString();
     }
 
+    // gửi email kích hoạt
     private void sendActivationEmail(String email, String activationCode) {
         String subject = "Kích hoạt tài khoản của bạn tại WebBookStore";
         String text = "<html><body>"
@@ -65,7 +68,9 @@ public class AccountService {
 
     }
 
+    // Kích hoạt tài khoản
     public ResponseEntity<?> activateAccount(String email, String activationCode) {
+
         User user = userRepository.findByEmail(email);
 
         if(user == null) {
