@@ -11,14 +11,16 @@ public class Endpoints {
             "/images/**",
             "/users/search/existsByUsername",
             "/users/search/existsByEmail",
+            "/account/activate",
             "/api/payment-methods",
-            "/api/shipping-methods",
-            "/api/orders"
+            "/api/shipping-methods"
+
     };
 
     public static final String[] PUBLIC_POST_ENDPOINTS = {
             "/account/sign-up",
-            "/api/orders"
+            "/api/orders",
+            "/account/sign-in",
     };
 
         public static final String[] ADMIN_GET_ENDPOINTS = {
