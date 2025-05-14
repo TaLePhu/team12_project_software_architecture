@@ -1,5 +1,6 @@
 package iuh.se.team.webbookstore_backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -33,5 +34,6 @@ public class PaymentMethod {
             },
             mappedBy = "paymentMethod"
     )
+    @JsonIgnore
     private List<Order> orders;
 }

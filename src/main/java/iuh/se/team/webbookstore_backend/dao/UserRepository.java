@@ -2,6 +2,7 @@ package iuh.se.team.webbookstore_backend.dao;
 
 import iuh.se.team.webbookstore_backend.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +16,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     public User findByUsername(String username);
 
     public User findByEmail(String email);
+
+    @Query("SELECT MAX(u.userId) FROM User u")
+    Integer findMaxUserId();
+
+    @Query("SELECT MAX(u.userId) FROM User u WHERE u.userId < 9000")
+    Integer findMaxUserIdUnder9000();
+
 }

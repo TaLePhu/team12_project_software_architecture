@@ -12,10 +12,14 @@ public class Endpoints {
             "/users/search/existsByUsername",
             "/users/search/existsByEmail",
             "/account/activate",
+            "/api/payment-methods",
+            "/api/shipping-methods"
+
     };
 
     public static final String[] PUBLIC_POST_ENDPOINTS = {
             "/account/sign-up",
+            "/api/orders",
             "/account/sign-in",
     };
 

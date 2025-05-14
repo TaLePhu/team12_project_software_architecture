@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import iuh.se.team.webbookstore_backend.entities.User;
 import org.springframework.cglib.core.internal.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -21,11 +22,30 @@ public class JwtService {
     public static final String SERECT = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
 
     // Tạo JWT dựa trên tên đang nhập
-    public String generateToken(String tenDangNhap) {
+//    public String generateToken(String tenDangNhap) {
+//        Map<String, Object> claims = new HashMap<>();
+//        claims.put("isAdmin", true);
+//        claims.put("x", "ABC" );
+//        return createToken(claims, tenDangNhap);
+//    }
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("isAdmin", true);
-        claims.put("x", "ABC" );
-        return createToken(claims, tenDangNhap);
+        claims.put("userId", user.getUserId());
+        claims.put("fullName", user.getLastName() + " " + user.getFirstName());
+        claims.put("lastName", user.getLastName());
+        claims.put("firstName", user.getFirstName());
+        claims.put("email", user.getEmail());
+        claims.put("phone", user.getPhoneNumber());
+        claims.put("billingAddress", user.getBillingAddress());
+        claims.put("shippingAddress", user.getShippingAddress());
+        claims.put("isActivated", user.isActivated());
+
+        // Lấy vai trò đầu tiên (nếu có)
+        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+            claims.put("role", user.getRoles().get(0).getRoleName()); // hoặc List<String> roles nếu bạn muốn gửi nhiều vai trò
+        }
+
+        return createToken(claims, user.getUsername()); // `sub` là username
     }
 
     // Tạo JWT với các claim đã chọn

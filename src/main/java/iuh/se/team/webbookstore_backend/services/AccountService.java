@@ -22,38 +22,56 @@ public class AccountService {
     @Autowired
     private EmailService emailService;
 
-    // Đăng ký tài khoản
-    public ResponseEntity<?> signUp(User user) {
+//    public ResponseEntity<?> signUp(User user) {
+//        if(userRepository.existsByUsername(user.getUsername())) {
+//            return ResponseEntity.badRequest().body("Username already exists");
+//        } else if(userRepository.existsByEmail(user.getEmail())) {
+//            return ResponseEntity.badRequest().body("Email already exists");
+//        }
+//
+//        //encode user password
+//        String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+//        user.setPassword(encodedPassword);
+//
+//        //create and assign Activation Code
+//        user.setActivationCode(createActivationCode());
+//        user.setActivated(false);
+//
+//        //save user to database
+//        User newUser = userRepository.save(user);
+//
+//        //gửi email kích hoạt cho user để kích hoạt
+//        sendActivationEmail(newUser.getEmail(), newUser.getActivationCode());
+//
+//        return ResponseEntity.ok("signUp successful");
+//    };
+public ResponseEntity<?> signUp(User user) {
+    if (userRepository.existsByUsername(user.getUsername())) {
+        return ResponseEntity.badRequest().body("Username already exists");
+    } else if (userRepository.existsByEmail(user.getEmail())) {
+        return ResponseEntity.badRequest().body("Email already exists");
+    }
 
-        if(userRepository.existsByUsername(user.getUsername())) {
-            return ResponseEntity.badRequest().body("Username already exists");
-        } else if(userRepository.existsByEmail(user.getEmail())) {
-            return ResponseEntity.badRequest().body("Email already exists");
-        }
+    // Gán userId < 9000 nếu có thể
+    Integer maxUserIdUnder9000 = userRepository.findMaxUserIdUnder9000();
+    int nextUserId = (maxUserIdUnder9000 == null || maxUserIdUnder9000 < 1) ? 1 : maxUserIdUnder9000 + 1;
 
-        //encode user password
-        String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
+    user.setUserId(nextUserId); // Gán id thủ công
+    user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    user.setActivationCode(createActivationCode());
+    user.setActivated(false);
 
-        //create and assign Activation Code
-        user.setActivationCode(createActivationCode());
-        user.setActivated(false);
+    User newUser = userRepository.save(user);
+    sendActivationEmail(newUser.getEmail(), newUser.getActivationCode());
 
-        //save user to database
-        User newUser = userRepository.save(user);
+    return ResponseEntity.ok("signUp successful");
+}
 
-        //gửi email kích hoạt cho user để kích hoạt
-        sendActivationEmail(newUser.getEmail(), newUser.getActivationCode());
-
-        return ResponseEntity.ok("signUp successful");
-    };
-
-    // tạo mã kích hoạt
+    // create activation code
     private String createActivationCode() {
         return UUID.randomUUID().toString();
     }
 
-    // gửi email kích hoạt
     private void sendActivationEmail(String email, String activationCode) {
         String subject = "Kích hoạt tài khoản của bạn tại WebBookStore";
         String text = "<html><body>"
@@ -68,9 +86,7 @@ public class AccountService {
 
     }
 
-    // Kích hoạt tài khoản
     public ResponseEntity<?> activateAccount(String email, String activationCode) {
-
         User user = userRepository.findByEmail(email);
 
         if(user == null) {

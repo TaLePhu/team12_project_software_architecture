@@ -8,9 +8,12 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Optional;
+
 
 @RepositoryRestResource(path = "books")
 public interface BookRepository extends JpaRepository<Book, Integer> {
+    Optional<Book> findByBookId(int bookId);
     Page<Book> findByBookNameContaining(@RequestParam("bookName") String bookName, Pageable pageable);
 
     Page<Book> findByCategories_CategoryId(@RequestParam("categoryId") int categoryId, Pageable pageable);
