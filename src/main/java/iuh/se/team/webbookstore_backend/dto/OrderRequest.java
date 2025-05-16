@@ -20,4 +20,6 @@ public class OrderRequest {
     private String phoneNumber;
     private String lastName;
     private String firstName;
+    private String orderDate;
+    private String deliveryDate;
 }

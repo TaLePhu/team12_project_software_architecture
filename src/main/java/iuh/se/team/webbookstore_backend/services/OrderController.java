@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -122,6 +124,8 @@ public class OrderController {
             order.setShippingMethod(shippingMethodOpt.get());
             order.setEmail(orderRequest.getEmail());
             order.setPhoneNumber(orderRequest.getPhoneNumber());
+            order.setOrderDate(LocalDateTime.parse(orderRequest.getOrderDate()));  // parse theo ISO 8601
+            order.setDeliveryDate(LocalDateTime.parse(orderRequest.getDeliveryDate()));
 
             Order savedOrder = orderRepository.save(order);
 
@@ -172,12 +176,19 @@ public class OrderController {
     public ResponseEntity<?> confirmOrder(@RequestParam int orderId, @RequestParam String token) {
 
         Optional<Order> orderOpt = orderRepository.findById(orderId);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+
         if (orderOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Order not found");
         }
 
         Order order = orderOpt.get();
         List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(order);
+
+        String orderDateStr = order.getOrderDate() != null ? order.getOrderDate().format(formatter) : "N/A";
+        String deliveryDateStr = order.getDeliveryDate() != null ? order.getDeliveryDate().format(formatter) : "N/A";
+
 
         if (!order.getConfirmationToken().equals(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
@@ -210,6 +221,8 @@ public class OrderController {
                 + "Địa chỉ giao hàng: " + order.getShippingAddress() + "<br>"
                 + "Số điện thoại: " + order.getPhoneNumber() + "<br>"
                 + "Email: " + order.getEmail() + "</p>"
+                + "Ngày đặt hàng: " + orderDateStr + "<br>"
+                + "Ngày giao hàng dự kiến: " + deliveryDateStr + "</p>"
                 + "<p><strong>Danh sách sản phẩm:</strong></p>"
                 + productListHtml.toString()
                 + "<p><strong>Tổng tiền: " + String.format("%.0f", order.getTotalPrice()) + " VND</strong></p>";

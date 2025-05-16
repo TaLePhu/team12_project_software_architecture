@@ -3,6 +3,7 @@ package iuh.se.team.webbookstore_backend.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -76,4 +77,10 @@ public class Order {
 
     @Column(name = "confirmed")
     private boolean confirmed = false;
+
+    @Column(name = "order_date")
+    private LocalDateTime orderDate;
+
+    @Column(name = "delivery_date")
+    private LocalDateTime deliveryDate;
 }
