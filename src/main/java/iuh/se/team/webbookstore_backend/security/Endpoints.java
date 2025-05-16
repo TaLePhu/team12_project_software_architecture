@@ -13,7 +13,8 @@ public class Endpoints {
             "/users/search/existsByEmail",
             "/account/activate",
             "/api/payment-methods",
-            "/api/shipping-methods"
+            "/api/shipping-methods",
+            "/api/orders/confirm",
 
     };
 

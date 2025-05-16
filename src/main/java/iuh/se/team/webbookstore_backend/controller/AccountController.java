@@ -1,5 +1,8 @@
 package iuh.se.team.webbookstore_backend.controller;
 
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
 import iuh.se.team.webbookstore_backend.entities.User;
 import iuh.se.team.webbookstore_backend.security.JwtResponse;
 import iuh.se.team.webbookstore_backend.security.LoginRequest;
@@ -17,7 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -37,6 +42,14 @@ public class AccountController {
     private JwtService jwtService;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+
+    private Bucket resolveBucket(String key) {
+        return buckets.computeIfAbsent(key, k -> Bucket.builder()
+                .addLimit(Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1)))) // 5 request/phút
+                .build());
+    }
 
 
     @PostMapping("/sign-up")
@@ -81,20 +94,28 @@ public class AccountController {
 //    }
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody LoginRequest loginRequest) {
+        String key = loginRequest.getUsername(); // Hoặc IP người dùng nếu muốn giới hạn theo IP
+
+        Bucket bucket = resolveBucket(key);
         // Tìm người dùng từ tên đăng nhập
-        User user = userService.findByUsername(loginRequest.getUsername());
+       // User user = userService.findByUsername(loginRequest.getUsername());
 
-        // Kiểm tra nếu người dùng không tồn tại hoặc mật khẩu không đúng
-        if (user == null || !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return ResponseEntity.badRequest().body("Tên đăng nhập hoặc mật khẩu không chính xác.");
-        }
-
-        // Nếu xác thực thành công, tạo token JWT
-        try {
-            final String jwt = jwtService.generateToken(user); // Sử dụng generateToken với đối tượng User
-            return ResponseEntity.ok(new JwtResponse(jwt)); // Trả về token
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Xác thực không thành công.");
+        if (bucket.tryConsume(1)) {
+            // Xử lý đăng nhập như bình thường
+            User user = userService.findByUsername(loginRequest.getUsername());
+            if (user == null || !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+                return ResponseEntity.badRequest().body("Tên đăng nhập hoặc mật khẩu không chính xác.");
+            }
+            try {
+                final String jwt = jwtService.generateToken(user);
+                return ResponseEntity.ok(new JwtResponse(jwt));
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("Xác thực không thành công.");
+            }
+        } else {
+            // Vượt quá giới hạn
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body("Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.");
         }
     }
 }

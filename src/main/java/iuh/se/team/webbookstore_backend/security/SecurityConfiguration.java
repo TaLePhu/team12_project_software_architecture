@@ -1,6 +1,7 @@
 package iuh.se.team.webbookstore_backend.security;
 
 import iuh.se.team.webbookstore_backend.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,12 +12,16 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
 
 @Configuration
 public class SecurityConfiguration {
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     //Mã hóa mật khẩu bằng BCryptPasswordEncoder
     @Bean
@@ -44,8 +49,12 @@ public class SecurityConfiguration {
                 config -> config
                         .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.POST, Endpoints.PUBLIC_POST_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()  // Đảm bảo rằng endpoint này công khai
+                        .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
+
+                        .requestMatchers("/api/cart/**").authenticated()
+
                         .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_GET_ENDPOINTS).hasAuthority("ADMIN")
+
                         .anyRequest().authenticated()
         );
 
@@ -55,7 +64,7 @@ public class SecurityConfiguration {
                 CorsConfiguration corsConfig = new CorsConfiguration();
                 corsConfig.addAllowedOrigin(Endpoints.front_end_host);//- Cho phép yêu cầu từ một host được chỉ định (`front_end_host`).
                 corsConfig.addAllowedOriginPattern("*");
-                corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+                corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 corsConfig.addAllowedHeader("*"); // -Chấp nhận mọi header từ phía client.
                 return corsConfig;
             });
@@ -65,6 +74,10 @@ public class SecurityConfiguration {
 
         //Mục đích: Kích hoạt xác thực HTTP Basic
         http.httpBasic(Customizer.withDefaults());
+
+        //- Cấu hình để sử dụng JWT cho xác thực
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         //Vô hiệu hóa CSRF (Cross-Site Request Forgery)
         http.csrf(csrf -> csrf.disable());//Là một cơ chế bảo mật để ngăn chặn các yêu cầu giả mạo từ trình duyệt.
         return http.build();

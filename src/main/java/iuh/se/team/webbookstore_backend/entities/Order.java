@@ -65,4 +65,15 @@ public class Order {
             mappedBy = "order"
     )
     private List<OrderDetail> orderDetails;
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "confirmation_token")
+    private String confirmationToken;
+
+    @Column(name = "confirmed")
+    private boolean confirmed = false;
 }

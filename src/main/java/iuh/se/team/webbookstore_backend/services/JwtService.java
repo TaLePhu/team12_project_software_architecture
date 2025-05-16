@@ -44,8 +44,9 @@ public class JwtService {
         if (user.getRoles() != null && !user.getRoles().isEmpty()) {
             claims.put("role", user.getRoles().get(0).getRoleName()); // hoặc List<String> roles nếu bạn muốn gửi nhiều vai trò
         }
-
+        System.out.println(">>> GENERATING NEW TOKEN at: " + System.currentTimeMillis());
         return createToken(claims, user.getUsername()); // `sub` là username
+
     }
 
     // Tạo JWT với các claim đã chọn
@@ -54,9 +55,12 @@ public class JwtService {
                 .setClaims(claims)//- Thêm payload (dữ liệu bổ sung) vào token.
                 .setSubject(tenDangNhap)//- Thiết lập thông tin chính (tên người dùng) trong JWT (**subject**).
                 .setIssuedAt(new Date(System.currentTimeMillis()))//- - Ngày phát hành token.
-                .setExpiration(new Date(System.currentTimeMillis()+30*60*1000)) // JWT hết hạn sau 30 phút
-                .signWith(SignatureAlgorithm.HS256,getSigneKey())//- Ký token bằng thuật toán **HS256** với khóa bí mật được trích xuất từ hàm `getSignKey()`.
+                //.setExpiration(new Date(System.currentTimeMillis()+30*60*1000)) // JWT hết hạn sau 30 phút
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .signWith(SignatureAlgorithm.HS256,getSigneKey())//- Ký token bằng thuật toán **HS256** v
+                // ới khóa bí mật được trích xuất từ hàm `getSignKey()`.
                 .compact();
+
     }
 
     // Lấy serect key
