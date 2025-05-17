@@ -22,6 +22,7 @@ public class Endpoints {
             "/account/sign-up",
             "/api/orders",
             "/account/sign-in",
+            "/images/upload",
     };
 
         public static final String[] ADMIN_GET_ENDPOINTS = {
