@@ -84,6 +84,7 @@ public class OrderController {
 
             User user;
 
+
             // Nếu userId = 0, tức là khách lẻ
             if (orderRequest.getUserId() == 0) {
                 // Lấy userId lớn nhất hiện tại và cộng thêm 1
@@ -156,6 +157,18 @@ public class OrderController {
                     continue; // hoặc throw exception tùy cách xử lý
                 }
 
+                Book book = bookOpt.get();
+
+                int requestedQty = detailReq.getQuantity();
+                if (book.getQuantity() < requestedQty) {
+                    return ResponseEntity.badRequest().body("Sách '" + book.getBookName() + "' không đủ số lượng");
+                }
+
+                // Giảm tồn kho, tăng số lượng đang giữ
+                book.setQuantity(book.getQuantity() - requestedQty);
+                book.setReserved(book.getReserved() + requestedQty);
+                bookRepository.save(book); // nhớ lưu lại book
+
                 OrderDetail detail = new OrderDetail();
                 detail.setOrder(savedOrder);
                 detail.setBook(bookOpt.get());
@@ -184,6 +197,15 @@ public class OrderController {
         }
 
         Order order = orderOpt.get();
+
+        // Check nếu quá 1 ngày (đơn hàng hết hạn)
+        LocalDateTime createdTime = order.getOrderDate();
+        if (createdTime != null && createdTime.isBefore(LocalDateTime.now().minusDays(1))) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .header("Location", "http://localhost:3000/order-confirm-false") // điều hướng tới FE lỗi
+                    .build();
+        }
+
         List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(order);
 
         String orderDateStr = order.getOrderDate() != null ? order.getOrderDate().format(formatter) : "N/A";
@@ -204,7 +226,13 @@ public class OrderController {
         for (OrderDetail detail : orderDetails) {
             String bookTitle = detail.getBook().getBookName();
             int quantity = detail.getQuantity();
+            Book book = detail.getBook();
+            int reserved = book.getReserved();
             double price = detail.getSalePrice();
+
+            // Giảm số lượng đang giữ vì đơn đã xác nhận
+            book.setReserved(reserved - quantity);
+            bookRepository.save(book);
 
             productListHtml.append("<li>")
                     .append(bookTitle)

@@ -64,34 +64,6 @@ public class AccountController {
         return response;
     };
 
-//    @PostMapping("/sign-in")
-//    public ResponseEntity<?> signIn(@RequestBody LoginRequest loginRequest){
-//        // Xác thực người dùng bằng tên đăng nhập và mật khẩu
-//        try {
-//            Authentication authentication = authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-//            );
-//            // Nếu xác thực thành công, tạo token JWT
-//            if(authentication.isAuthenticated()){
-//                final String jwt = jwtService.generateToken(loginRequest.getUsername());
-//                return ResponseEntity.ok(new JwtResponse(jwt));
-//            }
-//        }catch (AuthenticationException e){
-//            // Xác thực không thành công, trả về lỗi hoặc thông báo
-//            return ResponseEntity.badRequest().body("Tên đăng nhập hoặc mật khẩu không chính xác.");
-//        }
-//        return ResponseEntity.badRequest().body("Xác thực không thành công.");
-//    }
-//    @PostMapping("/sign-in")
-//    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
-//        User user = userService.findByUsername(req.getUsername());
-//        if (user == null || !passwordEncoder.matches(req.getPassword(), user.getPassword())) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
-//        }
-//
-//        String token = jwtService.generateToken(user);
-//        return ResponseEntity.ok(Map.of("jwt", token));
-//    }
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody LoginRequest loginRequest) {
         String key = loginRequest.getUsername(); // Hoặc IP người dùng nếu muốn giới hạn theo IP
@@ -108,7 +80,12 @@ public class AccountController {
             }
             try {
                 final String jwt = jwtService.generateToken(user);
-                return ResponseEntity.ok(new JwtResponse(jwt));
+                // Kiểm tra xem user có role là ADMIN không
+                String role = user.getRoles().stream()
+                        .anyMatch(r -> r.getRoleName().equalsIgnoreCase("ADMIN")) ? "ADMIN" : "USER";
+
+                return ResponseEntity.ok(new JwtResponse(jwt, role));
+
             } catch (Exception e) {
                 return ResponseEntity.badRequest().body("Xác thực không thành công.");
             }

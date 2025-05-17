@@ -53,6 +53,7 @@ public class SecurityConfiguration {
 
                         .requestMatchers("/api/cart/**").authenticated()
 
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_GET_ENDPOINTS).hasAuthority("ADMIN")
 
                         .anyRequest().authenticated()
@@ -64,6 +65,7 @@ public class SecurityConfiguration {
                 CorsConfiguration corsConfig = new CorsConfiguration();
                 corsConfig.addAllowedOrigin(Endpoints.front_end_host);//- Cho phép yêu cầu từ một host được chỉ định (`front_end_host`).
                 corsConfig.addAllowedOriginPattern("*");
+
                 corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 corsConfig.addAllowedHeader("*"); // -Chấp nhận mọi header từ phía client.
                 return corsConfig;

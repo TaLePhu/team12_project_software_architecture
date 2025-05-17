@@ -77,4 +77,7 @@ public class Book {
             cascade = CascadeType.ALL
     )
     private List<FavoriteBook> favoriteBooks;
+
+    @Column(name = "reserved")
+    private int reserved;
 }
