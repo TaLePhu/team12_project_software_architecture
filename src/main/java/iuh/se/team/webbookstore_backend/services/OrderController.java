@@ -269,4 +269,15 @@ public class OrderController {
                 .build();
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllOrders() {
+        try {
+            List<Order> orders = orderRepository.findAll();
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching orders: " + e.getMessage());
+        }
+    }
+
 }

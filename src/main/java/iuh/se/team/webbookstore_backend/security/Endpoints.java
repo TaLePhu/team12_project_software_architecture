@@ -28,5 +28,6 @@ public class Endpoints {
         public static final String[] ADMIN_GET_ENDPOINTS = {
             "/users",
             "/users/**",
+                "/api/statistics/dashboard",
     };
 }
