@@ -6,6 +6,8 @@ public class Endpoints {
     public static final String[] PUBLIC_GET_ENDPOINTS = {
             "/books",
             "/books/**",
+            "books/search/**",
+            "/books/search/findByBookNameContainingAndCategoryIds",
             "/books/*/images",
             "/images",
             "/images/**",
@@ -15,6 +17,8 @@ public class Endpoints {
             "/api/payment-methods",
             "/api/shipping-methods",
             "/api/orders/confirm",
+            "/categories",
+            "/categories/**",
 
     };
 
