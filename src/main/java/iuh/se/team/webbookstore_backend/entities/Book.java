@@ -50,6 +50,7 @@ public class Book {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
+    @JsonIgnoreProperties("bookList")
     private List<Category> categories;
 
     @OneToMany(fetch = FetchType.LAZY,
@@ -76,8 +77,18 @@ public class Book {
             mappedBy = "book",
             cascade = CascadeType.ALL
     )
+
     private List<FavoriteBook> favoriteBooks;
 
     @Column(name = "reserved")
     private int reserved;
+
+    @Column(name = "supplier")
+    private String supplier; // Nhà cung cấp
+
+    @Column(name = "number_of_pages")
+    private int numberOfPages; // Số trang
+
+    @Column(name = "publisher")
+    private String publisher; // Nhà xuất bản
 }
