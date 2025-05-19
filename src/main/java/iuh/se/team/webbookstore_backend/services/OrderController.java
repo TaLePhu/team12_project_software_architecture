@@ -201,6 +201,17 @@ public class OrderController {
         // Check nếu quá 1 ngày (đơn hàng hết hạn)
         LocalDateTime createdTime = order.getOrderDate();
         if (createdTime != null && createdTime.isBefore(LocalDateTime.now().minusDays(1))) {
+            List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(order);
+            for (OrderDetail detail : orderDetails) {
+                Book book = detail.getBook();
+                int reservedQty = detail.getQuantity();
+
+                // Trả lại số lượng đã giữ
+                book.setQuantity(book.getQuantity() + reservedQty);
+                book.setReserved(book.getReserved() - reservedQty);
+
+                bookRepository.save(book);
+            }
             return ResponseEntity.status(HttpStatus.FOUND)
                     .header("Location", "http://localhost:3000/order-confirm-false") // điều hướng tới FE lỗi
                     .build();

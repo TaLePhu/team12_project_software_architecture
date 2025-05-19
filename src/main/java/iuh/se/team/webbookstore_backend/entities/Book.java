@@ -78,6 +78,6 @@ public class Book {
     )
     private List<FavoriteBook> favoriteBooks;
 
-    @Column(name = "reserved", columnDefinition = "int default 0")
-    private Integer reserved = 0;
+    @Column(name = "reserved")
+    private int reserved;
 }

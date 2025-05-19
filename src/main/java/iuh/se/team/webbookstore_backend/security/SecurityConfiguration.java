@@ -50,9 +50,14 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.POST, Endpoints.PUBLIC_POST_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/books/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/books/search").permitAll()
 
+                        //.requestMatchers("/books/search/**").permitAll() // (Nếu còn route search khác)
+
+                        //.requestMatchers("/users/**").authenticated()
                         .requestMatchers("/api/cart/**").authenticated()
-
+                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_GET_ENDPOINTS).hasAuthority("ADMIN")
 
@@ -72,10 +77,30 @@ public class SecurityConfiguration {
             });
         });
 
+        http.exceptionHandling(handler -> handler
+                .authenticationEntryPoint((request, response, authException) -> {
+                    if (!response.isCommitted()) {
+                        response.setStatus(401);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                    }
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    System.out.println("AccessDeniedHandler invoked");
+                    if (!response.isCommitted()) {
+                        response.setStatus(403);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\": \"Forbidden\"}");
+                    } else {
+                        System.out.println("Response already committed in AccessDeniedHandler");
+                    }
+                })
+        );
+
 
 
         //Mục đích: Kích hoạt xác thực HTTP Basic
-        http.httpBasic(Customizer.withDefaults());
+//        http.httpBasic(Customizer.withDefaults());
 
         //- Cấu hình để sử dụng JWT cho xác thực
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

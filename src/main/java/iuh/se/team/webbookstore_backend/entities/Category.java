@@ -26,10 +26,5 @@ public class Category {
             CascadeType.DETACH, CascadeType.REFRESH
     })
     @JsonIgnore
-    @JoinTable(
-            name = "book_category",
-            joinColumns = @JoinColumn(name = "category_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
-    )
     private List<Book> bookList;
 }
