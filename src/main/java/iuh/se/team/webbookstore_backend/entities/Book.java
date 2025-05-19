@@ -80,4 +80,13 @@ public class Book {
 
     @Column(name = "reserved")
     private int reserved;
+
+    @Column(name = "supplier")
+    private String supplier;
+
+    @Column(name = "publisher")
+    private String publisher;
+
+    @Column(name = "number_of_pages")
+    private int numberOfPages;
 }
