@@ -12,10 +12,6 @@ public interface BookSumaryDTO {
     double getSalePrice();
     int getQuantity();
     double getAverageRating();
-    String getSupplier();
-    int getNumberOfPages();
-    String getStringPublisher();
-
 
     List<CategoryDTO> getCategories();
 

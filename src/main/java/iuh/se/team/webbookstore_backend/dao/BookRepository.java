@@ -69,4 +69,5 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             @Param("categoryIds") List<Integer> categoryIds,
             Pageable pageable
     );
+
 }

@@ -50,7 +50,6 @@ public class Book {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    @JsonIgnoreProperties("bookList")
     private List<Category> categories;
 
     @OneToMany(fetch = FetchType.LAZY,
