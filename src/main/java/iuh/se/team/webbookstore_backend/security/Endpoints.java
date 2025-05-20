@@ -37,5 +37,32 @@ public class Endpoints {
             "/users",
             "/users/**",
                 "/api/statistics/dashboard",
+                "/admin/orders",
+                "/admin/users",
+                "/admin/users/**"
+    };
+
+    public static final String[] ADMIN_POST_ENDPOINTS = {
+            "/books",
+            "/categories",
+            "/admin/orders",
+            "/admin/orders/**",
+            "/admin/users",
+
+    };
+
+    public static final String[] ADMIN_DELETE_ENDPOINTS = {
+            "/books",
+            "/categories",
+            "/admin/orders",
+            "/admin/orders/**",
+            "/admin/users",
+            "/admin/users/**"
+    };
+
+    public static final String[] ADMIN_PUT_ENDPOINTS = {
+            "/admin/orders",
+            "/admin/orders/**",
+            "/admin/users",
     };
 }

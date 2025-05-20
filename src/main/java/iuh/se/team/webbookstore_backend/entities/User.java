@@ -1,5 +1,6 @@
 package iuh.se.team.webbookstore_backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -11,7 +12,7 @@ import java.util.List;
 public class User {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private int userId;
 
@@ -53,6 +54,7 @@ public class User {
                     CascadeType.MERGE, CascadeType.PERSIST,
                     CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "user")
+    @JsonIgnoreProperties("user")
     private List<Review> reviews;
 
     @OneToMany(fetch = FetchType.LAZY,
@@ -60,6 +62,7 @@ public class User {
                     CascadeType.MERGE, CascadeType.PERSIST,
                     CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "user")
+    @JsonIgnoreProperties("user")
     private List<FavoriteBook> favoriteBooks;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {
@@ -71,6 +74,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @JsonIgnoreProperties("users")
     private List<Role> roles;
 
     @OneToMany(fetch = FetchType.LAZY,
@@ -80,5 +84,6 @@ public class User {
             },
             mappedBy = "user"
     )
+    @JsonIgnoreProperties("user")
     private List<Order> orders;
 }

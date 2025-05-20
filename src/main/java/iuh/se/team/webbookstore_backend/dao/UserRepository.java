@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @RepositoryRestResource(path = "users")
 public interface UserRepository extends JpaRepository<User, Integer> {
 
@@ -23,4 +25,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT MAX(u.userId) FROM User u WHERE u.userId < 9000")
     Integer findMaxUserIdUnder9000();
 
+    Optional<User> findById(Integer id);
 }
