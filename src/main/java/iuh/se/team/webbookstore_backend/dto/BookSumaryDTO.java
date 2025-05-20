@@ -12,6 +12,7 @@ public interface BookSumaryDTO {
     double getSalePrice();
     int getQuantity();
     double getAverageRating();
+    int getSold();
 
 
     List<CategoryDTO> getCategories();

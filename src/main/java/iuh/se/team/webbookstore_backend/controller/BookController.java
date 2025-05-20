@@ -1,4 +1,4 @@
-package iuh.se.team.webbookstore_backend.services;
+package iuh.se.team.webbookstore_backend.controller;
 
 import iuh.se.team.webbookstore_backend.dao.BookRepository;
 import iuh.se.team.webbookstore_backend.dao.ImageRepository;
@@ -7,18 +7,11 @@ import iuh.se.team.webbookstore_backend.entities.Book;
 import iuh.se.team.webbookstore_backend.entities.Image;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/books")
@@ -43,40 +36,36 @@ public class BookController {
         return images; // Trả về danh sách hình ảnh trực tiếp thay vì liên kết
     }
 
+
 //    @GetMapping("/search")
-//    public ResponseEntity<?> searchBooks(
-//            @RequestParam(name = "keyword", required = false) String keyword,
-//            @RequestParam(name = "categoryIds", required = false) String categoryIdsCsv,
-//            @RequestParam(name = "page", defaultValue = "0") int page,
-//            @RequestParam(name = "size", defaultValue = "5") int size) {
-//
-//        Pageable pageable = PageRequest.of(page, size);
-//        List<Integer> categoryIds = new ArrayList<>();
-//
-//        if (categoryIdsCsv != null && !categoryIdsCsv.isEmpty()) {
-//            categoryIds = Arrays.stream(categoryIdsCsv.split(","))
-//                    .map(String::trim)
-//                    .map(Integer::parseInt)
-//                    .collect(Collectors.toList());
-//        }
-//
-//        Page<Book> result;
-//
-//        if (!categoryIds.isEmpty()) {
-//            result = bookRepository.searchBooksByNameAndCategories(keyword, categoryIds, pageable);
-//        } else {
-//            result = bookRepository.searchBooksByNameOnly(keyword, pageable);
-//        }
-//
-//        return ResponseEntity.ok(result);
+//    public Page<BookSumaryDTO> searchBooks(
+//            @RequestParam("keyword") String keyword,
+//            @RequestParam("categoryIds") List<Integer> categoryIds,
+//            Pageable pageable
+//    ) {
+//        return bookRepository.searchBooksByKeywordAndCategories(keyword, categoryIds, pageable);
 //    }
 
+    @GetMapping("/search/by-keyword")
+    public Page<BookSumaryDTO> searchByKeyword(
+            @RequestParam("keyword") String keyword,
+            Pageable pageable) {
+        return bookRepository.findByKeyword(keyword, pageable);
+    }
+
+    @GetMapping("/search/by-category-and-keyword")
+    public Page<BookSumaryDTO> searchByCategoryAndKeyword(
+            @RequestParam("categoryId") int categoryId,
+            @RequestParam("keyword") String keyword,
+            Pageable pageable) {
+        return bookRepository.findByCategoryIdAndKeyword(categoryId, keyword, pageable);
+    }
+
     @GetMapping("/search")
-    public Page<BookSumaryDTO> searchBooks(
+    public Page<BookSumaryDTO> searchAdvanced(
             @RequestParam("keyword") String keyword,
             @RequestParam("categoryIds") List<Integer> categoryIds,
-            Pageable pageable
-    ) {
+            Pageable pageable) {
         return bookRepository.searchBooksByKeywordAndCategories(keyword, categoryIds, pageable);
     }
 

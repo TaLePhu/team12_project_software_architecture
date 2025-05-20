@@ -1,6 +1,6 @@
 
 
-package iuh.se.team.webbookstore_backend.services;
+package iuh.se.team.webbookstore_backend.controller;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
@@ -239,10 +239,12 @@ public class OrderController {
             int quantity = detail.getQuantity();
             Book book = detail.getBook();
             int reserved = book.getReserved();
+            int sold = book.getSold();
             double price = detail.getSalePrice();
 
             // Giảm số lượng đang giữ vì đơn đã xác nhận
             book.setReserved(reserved - quantity);
+            book.setSold(sold + quantity);
             bookRepository.save(book);
 
             productListHtml.append("<li>")

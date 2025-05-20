@@ -26,42 +26,27 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     Page<Book> findByBookNameContainingAndCategories_CategoryId(@RequestParam("bookName") String bookName, @RequestParam("categoryId") int categoryId, Pageable pageable);
 
-//    Page<Book> findDistinctByBookNameContainingAndCategories_CategoryIdIn(
-//            @Param("bookName") String bookName,
+
+
+//    @Query("""
+//        SELECT b FROM Book b
+//        JOIN b.categories c
+//        WHERE LOWER(b.bookName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+//        AND c.categoryId IN :categoryIds
+//        GROUP BY b.bookId
+//    """)
+//    Page<BookSumaryDTO> searchBooksByKeywordAndCategories(
+//            @Param("keyword") String keyword,
 //            @Param("categoryIds") List<Integer> categoryIds,
 //            Pageable pageable
 //    );
 
-    // Mới: Tìm sách theo tên và lọc nhiều categoryId (nhiều thể loại)
-    // Trường hợp có keyword và có categoryIds
-    @Query("SELECT DISTINCT b FROM Book b JOIN b.categories c " +
-            "WHERE (:bookName IS NULL OR LOWER(b.bookName) LIKE LOWER(CONCAT('%', :bookName, '%'))) " +
-            "AND c.categoryId IN :categoryIds")
-    Page<Book> searchBooksByNameAndCategories(
-            @Param("bookName") String bookName,
-            @Param("categoryIds") List<Integer> categoryIds,
-            Pageable pageable);
-
-    // Trường hợp chỉ có keyword (không lọc category)
-    @Query("SELECT DISTINCT b FROM Book b " +
-            "WHERE (:bookName IS NULL OR LOWER(b.bookName) LIKE LOWER(CONCAT('%', :bookName, '%')))")
-    Page<Book> searchBooksByNameOnly(
-            @Param("bookName") String bookName,
-            Pageable pageable);
-
-    // Tìm theo tên sách (không phân biệt hoa thường)
-    Page<Book> findByBookNameContainingIgnoreCase(String bookName, Pageable pageable);
-
-    // Tìm theo nhiều category
-    Page<Book> findByCategories_CategoryIdIn(List<Integer> categoryIds, Pageable pageable);
-
-    Page<Book> findByBookNameContainingIgnoreCaseAndCategories_CategoryIdIn(String keyword, List<Integer> categoryIds, Pageable pageable);
-
     @Query("""
         SELECT b FROM Book b 
         JOIN b.categories c 
-        WHERE LOWER(b.bookName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        AND c.categoryId IN :categoryIds
+        WHERE (LOWER(b.bookName) LIKE LOWER(CONCAT('%', :keyword, '%')) 
+               OR LOWER(b.authorName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+          AND c.categoryId IN :categoryIds
         GROUP BY b.bookId
     """)
     Page<BookSumaryDTO> searchBooksByKeywordAndCategories(
@@ -69,4 +54,29 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             @Param("categoryIds") List<Integer> categoryIds,
             Pageable pageable
     );
+
+    @Query("""
+        SELECT b FROM Book b
+        JOIN b.categories c
+        WHERE c.categoryId = :categoryId
+          AND (LOWER(b.bookName) LIKE LOWER(CONCAT('%', :keyword, '%')) 
+               OR LOWER(b.authorName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    """)
+    Page<BookSumaryDTO> findByCategoryIdAndKeyword(
+            @Param("categoryId") int categoryId,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
+    @Query("""
+        SELECT b FROM Book b
+        WHERE LOWER(b.bookName) LIKE LOWER(CONCAT('%', :keyword, '%')) 
+           OR LOWER(b.authorName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    """)
+    Page<BookSumaryDTO> findByKeyword(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
+
 }

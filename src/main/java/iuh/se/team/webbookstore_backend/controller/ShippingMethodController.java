@@ -1,4 +1,4 @@
-package iuh.se.team.webbookstore_backend.services;
+package iuh.se.team.webbookstore_backend.controller;
 
 import iuh.se.team.webbookstore_backend.dao.ShippingMethodRepository;
 import iuh.se.team.webbookstore_backend.entities.ShippingMethod;
