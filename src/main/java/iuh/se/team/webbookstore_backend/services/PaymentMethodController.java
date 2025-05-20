@@ -1,4 +1,4 @@
-package iuh.se.team.webbookstore_backend.controller;
+package iuh.se.team.webbookstore_backend.services;
 import iuh.se.team.webbookstore_backend.dao.PaymentMethodRepository;
 import iuh.se.team.webbookstore_backend.entities.PaymentMethod;
 import org.springframework.beans.factory.annotation.Autowired;

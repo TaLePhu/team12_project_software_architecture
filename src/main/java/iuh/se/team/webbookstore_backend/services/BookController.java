@@ -1,13 +1,16 @@
-package iuh.se.team.webbookstore_backend.controller;
+package iuh.se.team.webbookstore_backend.services;
 
 import iuh.se.team.webbookstore_backend.dao.BookRepository;
 import iuh.se.team.webbookstore_backend.dao.ImageRepository;
+import iuh.se.team.webbookstore_backend.dao.ReviewRepository;
 import iuh.se.team.webbookstore_backend.dto.BookSumaryDTO;
+import iuh.se.team.webbookstore_backend.dto.ReviewDTO;
 import iuh.se.team.webbookstore_backend.entities.Book;
 import iuh.se.team.webbookstore_backend.entities.Image;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +25,9 @@ public class BookController {
 
     @Autowired
     private ImageRepository imageRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @GetMapping("/{bookId}/images")
     public List<Image> getImagesForBook(@PathVariable int bookId) {
@@ -67,6 +73,12 @@ public class BookController {
             @RequestParam("categoryIds") List<Integer> categoryIds,
             Pageable pageable) {
         return bookRepository.searchBooksByKeywordAndCategories(keyword, categoryIds, pageable);
+    }
+
+    @GetMapping("/{bookId}/reviews")
+    public ResponseEntity<List<ReviewDTO>> getReviewsByBook(@PathVariable int bookId) {
+        List<ReviewDTO> reviews = reviewRepository.findByBookBookId(bookId);
+        return ResponseEntity.ok(reviews);
     }
 
 

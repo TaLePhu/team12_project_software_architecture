@@ -1,6 +1,6 @@
 
 
-package iuh.se.team.webbookstore_backend.controller;
+package iuh.se.team.webbookstore_backend.services;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
