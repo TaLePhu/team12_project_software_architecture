@@ -1,5 +1,6 @@
 package iuh.se.team.webbookstore_backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,6 +27,7 @@ public class OrderDetail {
             CascadeType.DETACH
     })
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference
     private Order order;
 
     @ManyToOne(cascade = {
