@@ -73,32 +73,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
 
-
-        // Ví dụ bạn dùng hàm kiểm tra các path public, hoặc hardcode như trên
-        // Nếu là OPTIONS method thì cũng bỏ qua
-        System.out.println("🔍 Checking shouldNotFilter for path: " + path);
-
-        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
-            System.out.println("✅ OPTIONS request, skipping filter.");
+        // Bỏ qua xác thực JWT cho GET /books và các path public khác
+        if (request.getMethod().equalsIgnoreCase("GET") && (
+                path.startsWith("/books")
+                        || path.startsWith("/categories")
+                        || path.startsWith("/images")
+                        || path.startsWith("/users/search/existsByUsername")
+                        || path.startsWith("/users/search/existsByEmail")
+                        || path.startsWith("/account/activate")
+                        || path.startsWith("/api/payment-methods")
+                        || path.startsWith("/api/shipping-methods")
+                        || path.startsWith("/api/orders/confirm")
+                        || path.startsWith("/account/sign-in")
+                        || path.startsWith("/account/sign-up")
+                        || path.startsWith("/books/")
+                        || path.startsWith("/books/search")
+                        || path.startsWith("/books/search/")
+                        || path.equals("/api/orders")
+        )) {
             return true;
         }
-        // Check các path public
-        return path.startsWith("/books")
-                || path.startsWith("/categories")
-                || path.startsWith("/images")
-                || path.startsWith("/users/search/existsByUsername")
-                || path.startsWith("/users/search/existsByEmail")
-                || path.startsWith("/account/activate")
-                || path.startsWith("/api/payment-methods")
-                || path.startsWith("/api/shipping-methods")
-                || path.startsWith("/api/orders/confirm")
-                || path.startsWith("/account/sign-in")
-                || path.startsWith("/account/sign-up")
-                ||path.startsWith("/books/")
-                || path.startsWith("/books/search")
-                || path.startsWith("/books/search/")
-                || path.equals("/api/orders");
 
+        // Nếu là OPTIONS method thì cũng bỏ qua
+        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+            return true;
+        }
+
+        return false;
     }
 
 }

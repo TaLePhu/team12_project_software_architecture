@@ -38,4 +38,12 @@ public class Endpoints {
             "/users/**",
                 "/api/statistics/dashboard",
     };
+
+    public static final String[] ADMIN_POST_ENDPOINTS = {
+            "/books",
+    };
+
+    public static final String[] ADMIN_DELETE_ENDPOINTS = {
+            "/books",
+    };
 }
