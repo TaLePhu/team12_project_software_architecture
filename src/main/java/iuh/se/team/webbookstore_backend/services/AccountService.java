@@ -56,7 +56,7 @@ public ResponseEntity<?> signUp(User user) {
     Integer maxUserIdUnder9000 = userRepository.findMaxUserIdUnder9000();
     int nextUserId = (maxUserIdUnder9000 == null || maxUserIdUnder9000 < 1) ? 1 : maxUserIdUnder9000 + 1;
 
-    user.setUserId(nextUserId); // Gán id thủ công
+//    user.setUserId(nextUserId); // Gán id thủ công
     user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
     user.setActivationCode(createActivationCode());
     user.setActivated(false);

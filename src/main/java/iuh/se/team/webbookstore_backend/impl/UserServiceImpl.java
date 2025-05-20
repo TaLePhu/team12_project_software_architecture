@@ -10,9 +10,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,10 +24,13 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
 
+    private final BCryptPasswordEncoder passwordEncoder;
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -33,20 +39,94 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findByUsername(username);
-        if(user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), rolesToAuthorities(user.getRoles()));
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
-    //    Chuyển đổi danh sách quyền (Quyen) của người dùng
- //    thành danh sách các đối tượng GrantedAuthority mà Spring Security sử dụng.
+    @Override
+    public User findById(int id) {
+        Optional<User> userOpt = userRepository.findById(id);
+        return userOpt.orElse(null);
+    }
+
+    @Override
+    public User createUser(User user) {
+        // Mã hóa password trước khi lưu
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Lấy danh sách roleId từ user.getRoles()
+        List<Role> rolesFromClient = user.getRoles();
+        List<Role> roles = null;
+
+        if (rolesFromClient != null && !rolesFromClient.isEmpty()) {
+            // Lấy role từ DB theo roleId
+            roles = rolesFromClient.stream()
+                    .map(r -> roleRepository.findById(r.getRoleId())
+                            .orElseThrow(() -> new RuntimeException("Role not found: " + r.getRoleId())))
+                    .collect(Collectors.toList());
+        } else {
+            // Nếu không có role, gán mặc định USER
+            Role userRole = roleRepository.findByRoleName("USER");
+            roles = List.of(userRole);
+        }
+        user.setRoles(roles);
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User updateUser(int id, User user) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isEmpty()) return null;
+        User existing = userOpt.get();
+
+        // Cập nhật các trường cần thiết (trừ password nếu không thay đổi)
+        existing.setFirstName(user.getFirstName());
+        existing.setLastName(user.getLastName());
+        existing.setUsername(user.getUsername());
+        existing.setEmail(user.getEmail());
+        existing.setPhoneNumber(user.getPhoneNumber());
+        existing.setBillingAddress(user.getBillingAddress());
+        existing.setShippingAddress(user.getShippingAddress());
+        existing.setActivated(user.isActivated());
+        existing.setGender(user.getGender());
+        existing.setRoles(user.getRoles());
+
+        // Nếu password thay đổi, mã hóa lại
+        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            existing.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
+        return userRepository.save(existing);
+    }
+
+    @Override
+    public boolean deleteUser(int id) {
+        if (!userRepository.existsById(id)) return false;
+        userRepository.deleteById(id);
+        return true;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                rolesToAuthorities(user.getRoles())
+        );
+    }
+
     private Collection<? extends GrantedAuthority> rolesToAuthorities(Collection<Role> roles) {
-      return roles.stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
-    };
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
+                .collect(Collectors.toList());
+    }
+
+
 
 
 }

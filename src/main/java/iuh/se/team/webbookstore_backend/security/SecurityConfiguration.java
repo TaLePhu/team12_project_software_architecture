@@ -1,5 +1,6 @@
 package iuh.se.team.webbookstore_backend.security;
 
+import iuh.se.team.webbookstore_backend.services.JwtService;
 import iuh.se.team.webbookstore_backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +21,13 @@ import java.util.Arrays;
 @Configuration
 public class SecurityConfiguration {
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+//    @Autowired
+//    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(UserService userService, JwtService jwtService) {
+        return new JwtAuthenticationFilter(userService, jwtService);
+    }
 
     //Mã hóa mật khẩu bằng BCryptPasswordEncoder
     @Bean
@@ -44,7 +50,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.authorizeHttpRequests(
                 config -> config
                         .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINTS).permitAll()
