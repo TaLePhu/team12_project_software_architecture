@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -40,6 +41,9 @@ public class ReviewController {
             return ResponseEntity.badRequest().build();
         }
 
+        Book book = bookOpt.get();
+        User user = userOpt.get();
+
         Review review = new Review();
         review.setRatingScore(request.getRatingScore());
         review.setComment(request.getComment());
@@ -48,6 +52,12 @@ public class ReviewController {
         review.setCreatedAt(LocalDateTime.now());
 
         Review saved = reviewRepository.save(review);
+
+        // Lấy lại tất cả review của sách để tính trung bình
+        Double avg = reviewRepository.findAverageRatingByBookId(bookOpt.get().getBookId());
+        double roundedAvg = avg != null ? Math.round(avg * 10.0) / 10.0 : 0.0;
+        book.setAverageRating(roundedAvg);
+        bookRepository.save(book);
 
         // Bạn có thể chuyển sang DTO nếu cần
         return ResponseEntity.ok().build(); // Hoặc trả DTO mới tạo
