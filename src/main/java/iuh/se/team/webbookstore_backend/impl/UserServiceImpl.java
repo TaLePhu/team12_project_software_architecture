@@ -126,7 +126,33 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean changePassword(String username, String currentPassword, String newPassword, String confirmPassword) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) return false;
 
+        // Kiểm tra mật khẩu hiện tại
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return false;
+        }
+
+        // Kiểm tra mật khẩu mới và xác nhận
+        if (!newPassword.equals(confirmPassword)) {
+            return false;
+        }
+
+        // Kiểm tra mật khẩu mới khác mật khẩu cũ
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            return false;
+        }
+
+        // Có thể thêm kiểm tra độ mạnh mật khẩu ở đây nếu muốn
+
+        // Cập nhật mật khẩu mới
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
+    }
 
 
 }

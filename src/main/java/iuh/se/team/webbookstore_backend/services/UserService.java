@@ -12,4 +12,6 @@ public interface UserService extends UserDetailsService {
     User createUser(User user);
     User updateUser(int id, User user);
     boolean deleteUser(int id);
+
+    boolean changePassword(String username, String currentPassword, String newPassword, String confirmPassword);
 }

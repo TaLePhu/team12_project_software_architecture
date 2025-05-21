@@ -3,6 +3,7 @@ package iuh.se.team.webbookstore_backend.controller;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
+import iuh.se.team.webbookstore_backend.dto.ChangePasswordRequest;
 import iuh.se.team.webbookstore_backend.entities.User;
 import iuh.se.team.webbookstore_backend.security.JwtResponse;
 import iuh.se.team.webbookstore_backend.security.LoginRequest;
@@ -93,6 +94,22 @@ public class AccountController {
             // Vượt quá giới hạn
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body("Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.");
+        }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request, Authentication authentication) {
+        String username = authentication.getName();
+        boolean result = userService.changePassword(
+                username,
+                request.getCurrentPassword(),
+                request.getNewPassword(),
+                request.getConfirmPassword()
+        );
+        if (result) {
+            return ResponseEntity.ok("Đổi mật khẩu thành công");
+        } else {
+            return ResponseEntity.badRequest().body("Đổi mật khẩu thất bại. Kiểm tra lại thông tin.");
         }
     }
 }
