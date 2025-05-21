@@ -6,6 +6,7 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
 import iuh.se.team.webbookstore_backend.dao.*;
+import iuh.se.team.webbookstore_backend.dto.OrderDTO;
 import iuh.se.team.webbookstore_backend.dto.OrderDetailRequest;
 import iuh.se.team.webbookstore_backend.dto.OrderRequest;
 import iuh.se.team.webbookstore_backend.entities.*;
@@ -285,7 +286,7 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<?> getAllOrders() {
         try {
-            List<Order> orders = orderRepository.findAll();
+            List<OrderDTO> orders = orderRepository.findAllProjectedBy();
             return ResponseEntity.ok(orders);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -1,6 +1,7 @@
 package iuh.se.team.webbookstore_backend.impl;
 
 import iuh.se.team.webbookstore_backend.dao.*;
+import iuh.se.team.webbookstore_backend.dto.OrderDTO;
 import iuh.se.team.webbookstore_backend.dto.OrderDetailRequest;
 import iuh.se.team.webbookstore_backend.dto.OrderRequest;
 import iuh.se.team.webbookstore_backend.entities.*;
@@ -68,8 +69,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<OrderDTO> getAllOrders() {
+        return orderRepository.findAllProjectedBy();
     }
 
     @Override
