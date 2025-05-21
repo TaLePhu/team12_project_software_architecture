@@ -2,6 +2,7 @@ package iuh.se.team.webbookstore_backend.controller;
 
 
 
+import iuh.se.team.webbookstore_backend.dao.OrderRepository;
 import iuh.se.team.webbookstore_backend.dto.OrderRequest;
 import iuh.se.team.webbookstore_backend.entities.Order;
 import iuh.se.team.webbookstore_backend.services.OrderService;
@@ -11,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/admin/orders")
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "http://localhost:3000")
 public class AdminOrderController {
     private final OrderService orderService;
+    private final OrderRepository orderRepository;
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -27,7 +31,7 @@ public class AdminOrderController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
@@ -53,5 +57,24 @@ public class AdminOrderController {
         orderService.deleteOrder(id);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{orderId}/deliver")
+    public ResponseEntity<?> confirmDelivery(@PathVariable int orderId) {
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Order not found");
+        }
+        Order order = orderOpt.get();
+
+        if (order.isDelivered()) {
+            return ResponseEntity.badRequest().body("Order already delivered");
+        }
+
+        order.setDelivered(true);
+        orderRepository.save(order);
+
+        return ResponseEntity.ok("Order marked as delivered");
+    }
+
 }
 

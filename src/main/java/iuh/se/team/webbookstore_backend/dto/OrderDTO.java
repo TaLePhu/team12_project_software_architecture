@@ -18,6 +18,7 @@ public interface OrderDTO {
     boolean isConfirmed();
     LocalDateTime getOrderDate();
     LocalDateTime getDeliveryDate();
+    boolean isDelivered();
 
     UserDTO getUser();
     PaymentMethodDTO getPaymentMethod();
@@ -49,6 +50,12 @@ public interface OrderDTO {
         interface BookDTO {
             int getBookId();
             String getBookName();
+            List <ImageDTO> getImages();
+        }
+
+        interface ImageDTO {
+            int getImageId();
+            String getImageData();
         }
     }
 }
