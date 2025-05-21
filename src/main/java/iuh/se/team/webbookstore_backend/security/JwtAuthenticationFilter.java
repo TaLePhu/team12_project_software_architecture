@@ -83,6 +83,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         || path.startsWith("/users/search/existsByUsername")
                         || path.startsWith("/users/search/existsByEmail")
                         || path.startsWith("/account/activate")
+                        || path.startsWith("/account/forgot-password")
+                        || path.startsWith("/account/reset-password")
                         || path.startsWith("/api/payment-methods")
                         || path.startsWith("/api/shipping-methods")
                         || path.startsWith("/api/orders/confirm")

@@ -30,6 +30,8 @@ public class Endpoints {
             "/account/sign-up",
             "/api/orders",
             "/account/sign-in",
+            "/account/forgot-password",
+            "/account/reset-password",
             "/images/upload",
     };
 
