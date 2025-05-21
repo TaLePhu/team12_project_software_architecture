@@ -90,4 +90,7 @@ public class Order {
 
     @Column(name = "delivery_date")
     private LocalDateTime deliveryDate;
+
+    @Column(name = "delivered")
+    private boolean delivered = false;
 }

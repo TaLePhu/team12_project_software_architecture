@@ -7,10 +7,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RepositoryRestResource(path = "orders")
 public interface OrderRepository extends JpaRepository<Order, Integer> {
     @Query("SELECT o FROM Order o")
     List<OrderDTO> findAllProjectedBy();
+
+    List<Order> findByConfirmedFalseAndOrderDateBefore(LocalDateTime dateTime);
+
+    List<Order> findByDeliveredFalseAndDeliveryDateBefore(LocalDateTime now);
+
+
 }

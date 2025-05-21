@@ -8,7 +8,6 @@ public class Endpoints {
             "/books/**",
             "/books/search",
             "/books/search/**",
-
             "/books/search/findByBookNameContainingAndCategoryIds",
             "/search/",
             "/search/**",
@@ -23,6 +22,9 @@ public class Endpoints {
             "/api/orders/confirm",
             "/categories",
             "/categories/**",
+            "/api/orders",
+            "/api/orders/**",
+
 
     };
 
