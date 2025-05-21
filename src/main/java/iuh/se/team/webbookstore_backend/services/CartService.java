@@ -47,7 +47,7 @@ public class CartService {
         if (existing.isPresent()) {
             existing.get().setQuantity(existing.get().getQuantity() + item.getQuantity());
         } else {
-            cart.add(item);
+            cart.add(0, item);
         }
         saveCart(userId, cart);
     }

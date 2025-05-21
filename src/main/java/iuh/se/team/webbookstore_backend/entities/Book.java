@@ -93,4 +93,7 @@ public class Book {
 
     @Column(name = "number_of_pages")
     private int numberOfPages;
+
+    @Column(name = "sold")
+    private int sold = 0;
 }
