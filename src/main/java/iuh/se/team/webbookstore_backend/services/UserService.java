@@ -1,5 +1,6 @@
 package iuh.se.team.webbookstore_backend.services;
 
+import iuh.se.team.webbookstore_backend.dto.UpdateUserRequest;
 import iuh.se.team.webbookstore_backend.entities.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -14,4 +15,5 @@ public interface UserService extends UserDetailsService {
     boolean deleteUser(int id);
 
     boolean changePassword(String username, String currentPassword, String newPassword, String confirmPassword);
+    User updateUserByUsername(String username, UpdateUserRequest request);
 }

@@ -4,6 +4,8 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
 import iuh.se.team.webbookstore_backend.dto.ChangePasswordRequest;
+import iuh.se.team.webbookstore_backend.dto.UpdateUserRequest;
+import iuh.se.team.webbookstore_backend.dto.UserProfileResponse;
 import iuh.se.team.webbookstore_backend.entities.User;
 import iuh.se.team.webbookstore_backend.security.JwtResponse;
 import iuh.se.team.webbookstore_backend.security.LoginRequest;
@@ -110,6 +112,27 @@ public class AccountController {
             return ResponseEntity.ok("Đổi mật khẩu thành công");
         } else {
             return ResponseEntity.badRequest().body("Đổi mật khẩu thất bại. Kiểm tra lại thông tin.");
+        }
+    }
+
+    @PutMapping("/update-profile")
+    public ResponseEntity<?> updateProfile(@RequestBody UpdateUserRequest request, Authentication authentication) {
+        String username = authentication.getName();
+        User updated = userService.updateUserByUsername(username, request);
+        if (updated != null) {
+            // Chuyển sang DTO để trả về dữ liệu gọn
+            UserProfileResponse response = new UserProfileResponse();
+            response.setFirstName(updated.getFirstName());
+            response.setLastName(updated.getLastName());
+            response.setEmail(updated.getEmail());
+            response.setPhoneNumber(updated.getPhoneNumber());
+            response.setBillingAddress(updated.getBillingAddress());
+            response.setShippingAddress(updated.getShippingAddress());
+            response.setGender(updated.getGender());
+            response.setUsername(updated.getUsername());
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body("Cập nhật thông tin thất bại.");
         }
     }
 }

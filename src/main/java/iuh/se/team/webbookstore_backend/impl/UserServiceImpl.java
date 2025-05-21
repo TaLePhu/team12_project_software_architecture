@@ -2,6 +2,7 @@ package iuh.se.team.webbookstore_backend.impl;
 
 import iuh.se.team.webbookstore_backend.dao.RoleRepository;
 import iuh.se.team.webbookstore_backend.dao.UserRepository;
+import iuh.se.team.webbookstore_backend.dto.UpdateUserRequest;
 import iuh.se.team.webbookstore_backend.entities.Role;
 import iuh.se.team.webbookstore_backend.entities.User;
 import iuh.se.team.webbookstore_backend.services.UserService;
@@ -152,6 +153,23 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         return true;
+    }
+
+    @Override
+    public User updateUserByUsername(String username, UpdateUserRequest request) {
+        User user = userRepository.findByUsername(username);
+
+        if (user == null) return null;
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setBillingAddress(request.getBillingAddress());
+        user.setShippingAddress(request.getShippingAddress());
+        if (request.getGender() != null) user.setGender(request.getGender());
+
+        return userRepository.save(user);
     }
 
 
