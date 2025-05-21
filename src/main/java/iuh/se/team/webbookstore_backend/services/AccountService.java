@@ -1,13 +1,20 @@
 package iuh.se.team.webbookstore_backend.services;
 
+import iuh.se.team.webbookstore_backend.dao.PasswordResetTokenRepository;
 import iuh.se.team.webbookstore_backend.dao.UserRepository;
+import iuh.se.team.webbookstore_backend.dto.ForgotPasswordRequest;
+import iuh.se.team.webbookstore_backend.dto.ResetPasswordRequest;
 import iuh.se.team.webbookstore_backend.entities.Notify;
+import iuh.se.team.webbookstore_backend.entities.PasswordResetToken;
 import iuh.se.team.webbookstore_backend.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -21,6 +28,68 @@ public class AccountService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    // Gửi OTP về email
+    public ResponseEntity<?> sendOtpToEmail(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail());
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Email không tồn tại.");
+        }
+
+        // Xóa OTP cũ nếu có
+        passwordResetTokenRepository.deleteByUser(user);
+
+        // Tạo OTP mới
+        String otp = String.format("%06d", new Random().nextInt(999999));
+        PasswordResetToken token = new PasswordResetToken();
+        token.setOtp(otp);
+        token.setUser(user);
+        token.setExpiryDate(LocalDateTime.now().plusMinutes(10));
+        passwordResetTokenRepository.save(token);
+
+        // Gửi email
+        String subject = "Mã OTP đặt lại mật khẩu WebBookStore";
+        String text = "<html><body>Mã OTP đặt lại mật khẩu của bạn là: <b>" + otp + "</b><br/>"
+                + "Mã này có hiệu lực trong 10 phút.</body></html>";
+        emailService.sendEmail("lephu18062@gmail.com", user.getEmail(), subject, text, true);
+
+        return ResponseEntity.ok("Đã gửi OTP về email.");
+    }
+
+    // Xác thực OTP và đổi mật khẩu
+    public ResponseEntity<?> resetPasswordWithOtp(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail());
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Email không tồn tại.");
+        }
+
+        Optional<PasswordResetToken> tokenOpt = passwordResetTokenRepository.findByUserAndOtp(user, request.getOtp());
+        if (tokenOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("OTP không hợp lệ.");
+        }
+
+        PasswordResetToken token = tokenOpt.get();
+        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
+            passwordResetTokenRepository.delete(token);
+            return ResponseEntity.badRequest().body("OTP đã hết hạn.");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("Mật khẩu xác nhận không khớp.");
+        }
+
+        // Đổi mật khẩu
+        user.setPassword(bCryptPasswordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        // Xóa OTP sau khi dùng
+        passwordResetTokenRepository.delete(token);
+
+        return ResponseEntity.ok("Đặt lại mật khẩu thành công.");
+    }
 
 //    public ResponseEntity<?> signUp(User user) {
 //        if(userRepository.existsByUsername(user.getUsername())) {

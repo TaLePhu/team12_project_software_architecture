@@ -3,9 +3,7 @@ package iuh.se.team.webbookstore_backend.controller;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
-import iuh.se.team.webbookstore_backend.dto.ChangePasswordRequest;
-import iuh.se.team.webbookstore_backend.dto.UpdateUserRequest;
-import iuh.se.team.webbookstore_backend.dto.UserProfileResponse;
+import iuh.se.team.webbookstore_backend.dto.*;
 import iuh.se.team.webbookstore_backend.entities.User;
 import iuh.se.team.webbookstore_backend.security.JwtResponse;
 import iuh.se.team.webbookstore_backend.security.LoginRequest;
@@ -134,5 +132,15 @@ public class AccountController {
         } else {
             return ResponseEntity.badRequest().body("Cập nhật thông tin thất bại.");
         }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        return accountService.sendOtpToEmail(request);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        return accountService.resetPasswordWithOtp(request);
     }
 }
