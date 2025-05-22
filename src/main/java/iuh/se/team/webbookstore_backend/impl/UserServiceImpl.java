@@ -172,5 +172,22 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    //
+    public boolean assignRolesToUser(int userId, List<Integer> roleIds) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) return false;
+
+        List<Role> roles = roleRepository.findAllById(roleIds);
+        if (roles.isEmpty()) return false;
+
+        User user = optionalUser.get();
+        user.getRoles().addAll(roles); // tránh trùng có thể dùng Set hoặc check trước
+        userRepository.save(user);
+        return true;
+    }
+
+
+
+
 
 }
