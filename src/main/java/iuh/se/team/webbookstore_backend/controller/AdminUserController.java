@@ -62,4 +62,16 @@ public class AdminUserController {
                 ResponseEntity.badRequest().body("User or Roles not found");
     }
 
+    //
+
+    @PutMapping("/{id}/roles")
+    public ResponseEntity<?> updateRolesForUser(@PathVariable int id, @RequestBody List<Integer> roleIds) {
+        boolean success = userService.updateRolesForUser(id, roleIds);
+        if (!success) {
+            return ResponseEntity.badRequest().body("User or Roles not found");
+        }
+        return ResponseEntity.ok("User roles updated successfully");
+    }
+
+
 }
