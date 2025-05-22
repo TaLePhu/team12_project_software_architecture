@@ -52,36 +52,31 @@ public class AccountController {
                 .build());
     }
 
-
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUpUser(@Validated @RequestBody User user) {
-      ResponseEntity<?> response = accountService.signUp(user);
-      return response;
-    };
+        ResponseEntity<?> response = accountService.signUp(user);
+        return response;
+    }
 
     @GetMapping("/activate")
     public ResponseEntity<?> activateAccount(@RequestParam String email, @RequestParam String activationCode) {
         ResponseEntity<?> response = accountService.activateAccount(email, activationCode);
         return response;
-    };
+    }
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody LoginRequest loginRequest) {
         String key = loginRequest.getUsername(); // Hoặc IP người dùng nếu muốn giới hạn theo IP
 
         Bucket bucket = resolveBucket(key);
-        // Tìm người dùng từ tên đăng nhập
-       // User user = userService.findByUsername(loginRequest.getUsername());
 
         if (bucket.tryConsume(1)) {
-            // Xử lý đăng nhập như bình thường
             User user = userService.findByUsername(loginRequest.getUsername());
             if (user == null || !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
                 return ResponseEntity.badRequest().body("Tên đăng nhập hoặc mật khẩu không chính xác.");
             }
             try {
                 final String jwt = jwtService.generateToken(user);
-                // Kiểm tra xem user có role là ADMIN không
                 String role = user.getRoles().stream()
                         .anyMatch(r -> r.getRoleName().equalsIgnoreCase("ADMIN")) ? "ADMIN" : "USER";
 
@@ -91,7 +86,6 @@ public class AccountController {
                 return ResponseEntity.badRequest().body("Xác thực không thành công.");
             }
         } else {
-            // Vượt quá giới hạn
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body("Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.");
         }
@@ -118,7 +112,6 @@ public class AccountController {
         String username = authentication.getName();
         User updated = userService.updateUserByUsername(username, request);
         if (updated != null) {
-            // Chuyển sang DTO để trả về dữ liệu gọn
             UserProfileResponse response = new UserProfileResponse();
             response.setFirstName(updated.getFirstName());
             response.setLastName(updated.getLastName());
@@ -142,5 +135,27 @@ public class AccountController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         return accountService.resetPasswordWithOtp(request);
+    }
+
+    // ======= THÊM API LẤY THÔNG TIN CÁ NHÂN =======
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Chưa đăng nhập");
+        }
+        User user = userService.findByUsername(authentication.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy user");
+        }
+        UserProfileResponse response = new UserProfileResponse();
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setEmail(user.getEmail());
+        response.setPhoneNumber(user.getPhoneNumber());
+        response.setBillingAddress(user.getBillingAddress());
+        response.setShippingAddress(user.getShippingAddress());
+        response.setGender(user.getGender());
+        response.setUsername(user.getUsername());
+        return ResponseEntity.ok(response);
     }
 }
