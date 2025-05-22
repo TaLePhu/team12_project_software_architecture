@@ -53,4 +53,25 @@ public class AdminUserController {
         if (!deleted) return ResponseEntity.notFound().build();
         return ResponseEntity.ok().build();
     }
+
+    // them
+    @PostMapping("/{id}/roles")
+    public ResponseEntity<?> assignRolesToUser(@PathVariable int id, @RequestBody List<Integer> roleIds) {
+        boolean success = userService.assignRolesToUser(id, roleIds);
+        return success ? ResponseEntity.ok("Roles assigned") :
+                ResponseEntity.badRequest().body("User or Roles not found");
+    }
+
+    //
+
+    @PutMapping("/{id}/roles")
+    public ResponseEntity<?> updateRolesForUser(@PathVariable int id, @RequestBody List<Integer> roleIds) {
+        boolean success = userService.updateRolesForUser(id, roleIds);
+        if (!success) {
+            return ResponseEntity.badRequest().body("User or Roles not found");
+        }
+        return ResponseEntity.ok("User roles updated successfully");
+    }
+
+
 }

@@ -16,4 +16,9 @@ public interface UserService extends UserDetailsService {
 
     boolean changePassword(String username, String currentPassword, String newPassword, String confirmPassword);
     User updateUserByUsername(String username, UpdateUserRequest request);
+
+    public boolean assignRolesToUser(int userId, List<Integer> roleIds);
+
+    boolean updateRolesForUser(int userId, List<Integer> roleIds);
+
 }
