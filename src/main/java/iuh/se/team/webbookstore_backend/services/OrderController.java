@@ -297,5 +297,16 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getOrdersByUserId(@PathVariable Long userId) {
+        try {
+            List<OrderDTO> orders = orderRepository.findAllProjectedByUserUserId(userId);
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching orders: " + e.getMessage());
+        }
+    }
+
 
 }

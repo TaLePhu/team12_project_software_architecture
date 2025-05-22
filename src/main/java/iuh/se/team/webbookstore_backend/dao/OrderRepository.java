@@ -19,5 +19,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     List<Order> findByDeliveredFalseAndDeliveryDateBefore(LocalDateTime now);
 
+    List<OrderDTO> findAllProjectedByUserUserId(Long userId);
 
 }
