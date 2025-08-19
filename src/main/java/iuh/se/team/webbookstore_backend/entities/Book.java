@@ -50,6 +50,7 @@ public class Book {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
+    @JsonIgnoreProperties("book")
     private List<Category> categories;
 
     @OneToMany(fetch = FetchType.LAZY,
@@ -61,6 +62,7 @@ public class Book {
             mappedBy = "book",
             cascade = CascadeType.ALL
     )
+    @JsonIgnoreProperties("book")
     private List<Review> reviews;
 
     @OneToMany(fetch = FetchType.LAZY,
@@ -70,11 +72,28 @@ public class Book {
                     CascadeType.DETACH, CascadeType.REFRESH
             }
     )
+    @JsonIgnoreProperties("book")
     private List<OrderDetail> orderDetails;
 
     @OneToMany(fetch = FetchType.LAZY,
             mappedBy = "book",
             cascade = CascadeType.ALL
     )
+    @JsonIgnoreProperties("book")
     private List<FavoriteBook> favoriteBooks;
+
+    @Column(name = "reserved")
+    private int reserved;
+
+    @Column(name = "supplier")
+    private String supplier;
+
+    @Column(name = "publisher")
+    private String publisher;
+
+    @Column(name = "number_of_pages")
+    private int numberOfPages;
+
+    @Column(name = "sold")
+    private int sold = 0;
 }

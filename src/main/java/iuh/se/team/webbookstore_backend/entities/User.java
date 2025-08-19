@@ -1,5 +1,6 @@
 package iuh.se.team.webbookstore_backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -42,11 +43,18 @@ public class User {
     @Column(name = "shipping_address")
     private String shippingAddress;
 
+    @Column(name = "is_activated")
+    private boolean isActivated;
+
+    @Column(name = "activation_code")
+    private String activationCode;
+
     @OneToMany(fetch = FetchType.LAZY,
             cascade = {
                     CascadeType.MERGE, CascadeType.PERSIST,
                     CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "user")
+    @JsonIgnoreProperties("user")
     private List<Review> reviews;
 
     @OneToMany(fetch = FetchType.LAZY,
@@ -54,9 +62,10 @@ public class User {
                     CascadeType.MERGE, CascadeType.PERSIST,
                     CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "user")
+    @JsonIgnoreProperties("user")
     private List<FavoriteBook> favoriteBooks;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {
             CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH
     })
@@ -65,6 +74,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @JsonIgnoreProperties("users")
     private List<Role> roles;
 
     @OneToMany(fetch = FetchType.LAZY,
@@ -74,5 +84,6 @@ public class User {
             },
             mappedBy = "user"
     )
+    @JsonIgnoreProperties("user")
     private List<Order> orders;
 }
